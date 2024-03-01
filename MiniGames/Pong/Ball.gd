@@ -20,4 +20,3 @@ func _physics_process(delta):
 		direction = direction.normalized() * currentSpeed
 		direction = direction.bounce(collision.normal)
 		currentSpeed = currentSpeed + BOOST
-		print(collision.collider.name)

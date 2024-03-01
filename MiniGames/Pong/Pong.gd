@@ -1,7 +1,7 @@
 extends Node2D
 
 func _ready():
-	print("Gang")
+	print("Loaded")
 
 
 func _on_GoalLeft_body_entered(body):

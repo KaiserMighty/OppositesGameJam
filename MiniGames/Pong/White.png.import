@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/White.png-72a57440e74cec5606a5390bd55d3568.stex"
+path="res://.import/White.png-ffdfc1a204a15fa137395948afebc065.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://MiniGames/White.png"
-dest_files=[ "res://.import/White.png-72a57440e74cec5606a5390bd55d3568.stex" ]
+source_file="res://MiniGames/Pong/White.png"
+dest_files=[ "res://.import/White.png-ffdfc1a204a15fa137395948afebc065.stex" ]
 
 [params]
 
