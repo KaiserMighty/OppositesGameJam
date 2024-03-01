@@ -13,6 +13,10 @@ config_version=4
 config/name="Retro Game Jam"
 config/icon="res://icon.png"
 
+[autoload]
+
+GlobalVars="*res://GlobalVars.gd"
+
 [gui]
 
 common/drop_mouse_on_gui_input_disabled=true
