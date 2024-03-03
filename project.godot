@@ -11,15 +11,24 @@ config_version=4
 [application]
 
 config/name="Retro Game Jam"
+run/main_scene="res://MainMenu.tscn"
 config/icon="res://icon.png"
 
 [autoload]
 
 GlobalVars="*res://GlobalVars.gd"
+UpgradeDB="*res://Levels/Autoshooter/UpgradeDB.tscn"
 
 [gui]
 
 common/drop_mouse_on_gui_input_disabled=true
+
+[layer_names]
+
+3d_physics/layer_1="World"
+3d_physics/layer_2="Player"
+3d_physics/layer_3="Enemy"
+3d_physics/layer_4="Loot"
 
 [physics]
 

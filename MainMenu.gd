@@ -4,7 +4,7 @@ var master_bus = AudioServer.get_bus_index("Master")
 var music_bus = AudioServer.get_bus_index("Music")
 
 func _on_Play_pressed():
-	get_tree().change_scene("res://LevelSelect.tscn")
+	get_tree().change_scene("res://Levels/Autoshooter/World.tscn")
 
 
 func _on_Tutorials_toggled(button_pressed):
