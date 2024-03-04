@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://MiniGames/Pong/White.png" type="Texture" id=1]
 [ext_resource path="res://Levels/Autoshooter/Player.gd" type="Script" id=2]
@@ -17,6 +17,9 @@ radius = 100.0
 
 [sub_resource type="CircleShape2D" id=5]
 radius = 15.0
+
+[sub_resource type="RectangleShape2D" id=6]
+extents = Vector2( 512, 288 )
 
 [node name="Player" type="KinematicBody2D" groups=["Player"]]
 script = ExtResource( 2 )
@@ -67,12 +70,34 @@ collision_mask = 8
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CollectArea"]
 shape = SubResource( 5 )
 
+[node name="SpawnProtection" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SpawnProtection"]
+shape = SubResource( 6 )
+
+[node name="ColorRect" type="ColorRect" parent="SpawnProtection/CollisionShape2D"]
+margin_left = -512.0
+margin_top = -288.0
+margin_right = 512.0
+margin_bottom = 288.0
+rect_min_size = Vector2( 1024, 576 )
+mouse_filter = 2
+color = Color( 0, 1, 0.0392157, 0.0392157 )
+
+[node name="RetreatTimer" type="Timer" parent="."]
+one_shot = true
+
 [connection signal="hurt" from="HurtBox" to="." method="_on_HurtBox_hurt"]
 [connection signal="timeout" from="Attack/SpearTimer" to="." method="_on_SpearTimer_timeout"]
 [connection signal="timeout" from="Attack/SpearTimer/SpearAttackTimer" to="." method="_on_SpearAttackTimer_timeout"]
 [connection signal="body_entered" from="EnemyDetector" to="." method="_on_EnemyDetector_body_entered"]
 [connection signal="body_exited" from="EnemyDetector" to="." method="_on_EnemyDetector_body_exited"]
 [connection signal="area_entered" from="GrabArea" to="." method="_on_GrabArea_area_entered"]
+[connection signal="body_entered" from="GrabArea" to="." method="_on_GrabArea_body_entered"]
+[connection signal="body_exited" from="GrabArea" to="." method="_on_GrabArea_body_exited"]
 [connection signal="area_entered" from="CollectArea" to="." method="_on_CollectArea_area_entered"]
+[connection signal="mouse_entered" from="SpawnProtection" to="." method="_on_SpawnProtection_mouse_entered"]
+[connection signal="mouse_exited" from="SpawnProtection" to="." method="_on_SpawnProtection_mouse_exited"]
+[connection signal="timeout" from="RetreatTimer" to="." method="_on_RetreatTimer_timeout"]
 
 [editable path="HurtBox"]

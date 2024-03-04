@@ -1,11 +1,11 @@
 extends KinematicBody2D
 
-export var speed = 50.0
-export var health = 10.0
-export var damageDealt = 1
-export var knockbackResist = 2
-export var experienceDrop = 1
-export var spawnCost = 1
+export var speed = 25.0
+export var health = 40.0
+export var damageDealt = 8
+export var knockbackResist = 7
+export var experienceDrop = 12
+export var spawnCost = 12
 
 var knockback = Vector2.ZERO
 var move = Vector2()

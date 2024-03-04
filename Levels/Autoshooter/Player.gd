@@ -20,6 +20,7 @@ onready var detectRange = get_node("EnemyDetector/CollisionShape2D")
 
 #Upgrades
 var availableOptions = []
+var selectedOptions = []
 var attackHealthUpgrade = 0
 var attackSpeedUpgrade = 0
 var attackDamageUpgrade = 0
@@ -34,22 +35,49 @@ var spearAttackSpeed = 2
 #Enemy
 var enemyClose = []
 
+#AI
+onready var retreatTimer = $RetreatTimer
+onready var nav = $NavigationAgent2D
+onready var navMesh = get_parent().get_node("Navigation2D")
+onready var lootBase = get_tree().get_nodes_in_group("Loot")[0]
+onready var enemyBase = get_tree().get_nodes_in_group("Enemies")[0]
+var velocity: Vector2 = Vector2.ZERO
+var path: Array = []
+var loot = []
+var eny = []
+var dangerEny = []
+enum {
+	KITE,
+	RETREAT,
+	COLLECT
+}
+var state = KITE
+
 #GUI
 onready var experienceBar = get_parent().get_node("Controller/GUILayer/GUI/ExperienceBar")
 onready var healthBar = get_parent().get_node("Controller/GUILayer/GUI/HealthBar")
 onready var levelLabel = get_parent().get_node("Controller/GUILayer/GUI/ExperienceBar/Level")
 onready var levelPanel = get_parent().get_node("Controller/GUILayer/GUI/LevelUp")
+onready var levelUpInstructions = get_parent().get_node("Controller/GUILayer/GUI/LevelUp/UpgradeInstructions")
 onready var upgradeOptions = get_parent().get_node("Controller/GUILayer/GUI/LevelUp/UpgradeOptions")
+onready var confirmButton = get_parent().get_node("Controller/GUILayer/GUI/LevelUp/ConfirmButton")
 onready var itemOptions = preload("res://Levels/Autoshooter/ItemOption.tscn")
 onready var deathPanel = get_parent().get_node("Controller/GUILayer/GUI/DeathPanel")
+onready var spawnPanel = get_parent().get_node("Controller/GUILayer/GUI/UnitSelect")
+onready var controller = get_parent().get_node("Controller")
 
 #Signal
 signal playerDeath
+signal spawnProtection(state)
+signal playerLevelUp
 
 func _ready():
-	var screen = get_viewport_rect().size
-	position.x = screen.x/2
-	position.y = screen.y/2
+	connect("playerLevelUp", controller, "monsterLevelUp")
+	
+	GlobalVars.weakEnemiesKilled = 0
+	GlobalVars.strongEnemiesKilled = 0
+	GlobalVars.tankEnemiesKilled = 0
+	GlobalVars.totalUpgrades = 0
 	
 	set_experienceBar(experience, calculate_experiencecap())
 	_on_HurtBox_hurt(0, 0, 0)
@@ -57,28 +85,46 @@ func _ready():
 	attack()
 
 func _physics_process(delta):
-	var directionV = get_axisV(KEY_W, KEY_S)
-	var directionH = get_axisH(KEY_A, KEY_D)
-	if directionV:
-		move.y = directionV * speed
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	var randomnum = rng.randf()
+	
+	eny.clear()
+	eny = enemyBase.get_children()
+	if eny.size() == 0:
+		state = COLLECT
 	else:
-		move.y = move_toward(move.y, 0, speed)
-	if directionH:
-		move.x = directionH * speed
-	else:
-		move.x = move_toward(move.x, 0, speed)
-	move_and_slide(move)
+		if not state == RETREAT:
+			state = KITE
+	
+	loot.clear()
+	loot = lootBase.get_children()
+	if loot.size() == 0:
+		loot.append(self)
+	
+	match state:
+		KITE:
+			move(get_circle_position(randomnum, eny[0]), delta)
+		RETREAT:
+			print("RETREAT")
+			move(dangerEny[0].global_position - self.global_position, delta)
+		COLLECT:
+			move(loot[0].global_position, delta)
+	
+func move(target, delta):
+	var direction = (target - global_position).normalized() 
+	var desired_velocity =  direction * speed
+	var steering = (desired_velocity - velocity) * delta * 2.5
+	velocity += steering
+	velocity = move_and_slide(velocity)
 
-func get_axisV(up, down):
-	if Input.is_key_pressed(up) && Input.is_key_pressed(down): return 0
-	if Input.is_key_pressed(up): return -1
-	elif Input.is_key_pressed(down): return 1
-
-func get_axisH(left, right):
-	if Input.is_key_pressed(left) && Input.is_key_pressed(right): return 0
-	if Input.is_key_pressed(left): return -1
-	elif Input.is_key_pressed(right): return 1
-
+func get_circle_position(random, target):
+	var kill_circle_centre = target.global_position
+	var radius = 800
+	var angle = random * PI * 2;
+	var x = kill_circle_centre.x + cos(angle) * radius;
+	var y = kill_circle_centre.y + sin(angle) * radius;
+	return Vector2(x, y)
 
 func _on_HurtBox_hurt(damage, _angle, _knockback):
 	health -= damage
@@ -129,10 +175,10 @@ func _on_EnemyDetector_body_exited(body):
 		enemyClose.erase(body)
 
 
+
 func _on_GrabArea_area_entered(area):
 	if area.is_in_group("Loot"):
 		area.target = self
-
 
 func _on_CollectArea_area_entered(area):
 	if area.is_in_group("Loot"):
@@ -170,20 +216,36 @@ func set_experienceBar(setValue = 1, setMaxValue = 100):
 
 func levelUp():
 	levelLabel.text = str("Level ", level)
+	levelUpInstructions.text = "Player will pick 1 of the 3 upgrades you give them"
 	var tween = levelPanel.create_tween()
-	tween.tween_property(levelPanel, "rect_position", Vector2(412, 200), 0.2).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
+	tween.tween_property(levelPanel, "rect_position", Vector2(312, 175), 0.2).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
 	tween.play()
 	levelPanel.visible = true
+	spawnPanel.visible = false
 	var options = 0
-	var optionsMax = 3
+	var optionsMax = 6
 	while options < optionsMax:
 		var optionChoice = itemOptions.instance()
 		optionChoice.item = get_random_item()
+		optionChoice.caller = 0
 		upgradeOptions.add_child(optionChoice)
 		options += 1
 	get_tree().paused = true
 	
-func upgrade_character(upgrade):
+func select_upgrade(upgrade, state):
+	if state == true:
+		selectedOptions.append(upgrade)
+	else:
+		selectedOptions.erase(upgrade)
+	if selectedOptions.size() == 3:
+		confirmButton.disabled = false
+	else:
+		confirmButton.disabled = true
+	
+func upgrade_character():
+	GlobalVars.totalUpgrades += 1
+	var upgrade = selectedOptions[randi() % selectedOptions.size()]
+	selectedOptions.clear()
 	match upgrade:
 		"health":
 			health += 20
@@ -215,10 +277,9 @@ func upgrade_character(upgrade):
 	for i in optionChildren:
 		i.queue_free()
 	availableOptions.clear()
-	levelPanel.visible = false
-	levelPanel.rect_position = Vector2(800, 50)
 	get_tree().paused = false
 	calculate_experience(0)
+	emit_signal("playerLevelUp")
 
 func get_random_item():
 	var listDB = []
@@ -233,8 +294,29 @@ func get_random_item():
 		return null
 		
 func death():
+	spawnPanel.visible = false
 	deathPanel.visible = true
-	get_tree().paused = true
 	emit_signal("playerDeath")
+	get_tree().paused = true
 	var tween = deathPanel.create_tween()
-	tween.tween_property(deathPanel, "rect_position", Vector2(412, 200), 3.0).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+	tween.tween_property(deathPanel, "rect_position", Vector2(412, 175), 3.0).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+
+
+func _on_SpawnProtection_mouse_entered():
+	emit_signal("spawnProtection", true)
+
+func _on_SpawnProtection_mouse_exited():
+	emit_signal("spawnProtection", false)
+
+func _on_RetreatTimer_timeout():
+	state = KITE
+
+func _on_GrabArea_body_entered(body):
+	if body.is_in_group("Enemy"):
+		state = RETREAT
+		dangerEny.append(body)
+		retreatTimer.start()
+
+func _on_GrabArea_body_exited(body):
+	if body.is_in_group("Enemy"):
+		dangerEny.erase(body)

@@ -3,7 +3,7 @@ extends Area2D
 var health = 1
 var speed = 100
 var damage = 5
-var knockback = 0
+var knockback = 100
 
 var target = Vector2.ZERO
 var angle = Vector2.ZERO

@@ -5,19 +5,11 @@ const ICON_PATH = ""
 const UPGRADES = {
 	"health": {
 		"icon": "",
-		"displayName": "20 Health"
-	},
-	"speed": {
-		"icon": "",
-		"displayName": "Movement Speed"
+		"displayName": "Heal"
 	},
 	"maxhp": {
 		"icon": "",
 		"displayName": "Max Health"
-	},
-	"attackSpeed": {
-		"icon": "",
-		"displayName": "Projectile Speed"
 	},
 	"attackDamage": {
 		"icon": "",
@@ -34,14 +26,6 @@ const UPGRADES = {
 	"attackAmount": {
 		"icon": "",
 		"displayName": "Burst Amount"
-	},
-	"cooldown": {
-		"icon": "",
-		"displayName": "Fire Rate"
-	},
-	"magnet": {
-		"icon": "",
-		"displayName": "Magnet"
 	},
 	"range": {
 		"icon": "",
