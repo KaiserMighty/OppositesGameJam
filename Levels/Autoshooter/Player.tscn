@@ -84,8 +84,59 @@ rect_min_size = Vector2( 1024, 576 )
 mouse_filter = 2
 color = Color( 0, 1, 0.0392157, 0.0392157 )
 
-[node name="RetreatTimer" type="Timer" parent="."]
-one_shot = true
+[node name="context_map" type="Node2D" parent="."]
+
+[node name="0" type="RayCast2D" parent="context_map"]
+enabled = true
+cast_to = Vector2( 0, -35 )
+collision_mask = 128
+collide_with_areas = true
+
+[node name="1" type="RayCast2D" parent="context_map"]
+enabled = true
+cast_to = Vector2( 17.67, -17.67 )
+collision_mask = 128
+collide_with_areas = true
+
+[node name="2" type="RayCast2D" parent="context_map"]
+enabled = true
+cast_to = Vector2( 35, 0 )
+collision_mask = 128
+collide_with_areas = true
+
+[node name="3" type="RayCast2D" parent="context_map"]
+enabled = true
+cast_to = Vector2( 17.67, 17.67 )
+collision_mask = 128
+collide_with_areas = true
+
+[node name="4" type="RayCast2D" parent="context_map"]
+enabled = true
+cast_to = Vector2( 0, 35 )
+collision_mask = 128
+collide_with_areas = true
+
+[node name="5" type="RayCast2D" parent="context_map"]
+enabled = true
+cast_to = Vector2( -17.67, 17.67 )
+collision_mask = 128
+collide_with_areas = true
+
+[node name="6" type="RayCast2D" parent="context_map"]
+enabled = true
+cast_to = Vector2( -35, 0 )
+collision_mask = 128
+collide_with_areas = true
+
+[node name="7" type="RayCast2D" parent="context_map"]
+enabled = true
+cast_to = Vector2( -17.67, -17.67 )
+collision_mask = 128
+collide_with_areas = true
+
+[node name="DebugTimer" type="Timer" parent="."]
+wait_time = 0.1
+autostart = true
 
 [connection signal="hurt" from="HurtBox" to="." method="_on_HurtBox_hurt"]
 [connection signal="timeout" from="Attack/SpearTimer" to="." method="_on_SpearTimer_timeout"]
@@ -93,11 +144,9 @@ one_shot = true
 [connection signal="body_entered" from="EnemyDetector" to="." method="_on_EnemyDetector_body_entered"]
 [connection signal="body_exited" from="EnemyDetector" to="." method="_on_EnemyDetector_body_exited"]
 [connection signal="area_entered" from="GrabArea" to="." method="_on_GrabArea_area_entered"]
-[connection signal="body_entered" from="GrabArea" to="." method="_on_GrabArea_body_entered"]
-[connection signal="body_exited" from="GrabArea" to="." method="_on_GrabArea_body_exited"]
 [connection signal="area_entered" from="CollectArea" to="." method="_on_CollectArea_area_entered"]
 [connection signal="mouse_entered" from="SpawnProtection" to="." method="_on_SpawnProtection_mouse_entered"]
 [connection signal="mouse_exited" from="SpawnProtection" to="." method="_on_SpawnProtection_mouse_exited"]
-[connection signal="timeout" from="RetreatTimer" to="." method="_on_RetreatTimer_timeout"]
+[connection signal="timeout" from="DebugTimer" to="." method="_on_DebugTimer_timeout"]
 
 [editable path="HurtBox"]

@@ -14,9 +14,9 @@ onready var collision = $CollisionShape2D
 #onready var sound = $sound
 
 func _ready():
-	if experience < 5:
+	if experience < 2:
 		return
-	elif experience < 25:
+	elif experience < 8:
 		pass
 		#sprite.texture = sprite_two
 	else:
@@ -32,6 +32,7 @@ func collect():
 	#sound.play()
 	collision.call_deferred("set", "disable", true)
 	sprite.visible = false
+	queue_free() #temp
 	return experience
 	
 #func _on_snd_collected_finished():

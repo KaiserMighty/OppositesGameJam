@@ -1,7 +1,7 @@
 extends KinematicBody2D
 
 #Character
-var speed = 100.0
+var speed = 140.0
 var move = Vector2()
 var health = 20.0
 var maxHealth = 20.0
@@ -36,22 +36,23 @@ var spearAttackSpeed = 2
 var enemyClose = []
 
 #AI
-onready var retreatTimer = $RetreatTimer
-onready var nav = $NavigationAgent2D
-onready var navMesh = get_parent().get_node("Navigation2D")
+onready var levelNavigation = get_parent().get_node("Navigation2D")
 onready var lootBase = get_tree().get_nodes_in_group("Loot")[0]
 onready var enemyBase = get_tree().get_nodes_in_group("Enemies")[0]
-var velocity: Vector2 = Vector2.ZERO
-var path: Array = []
+onready var raycasts  = get_node("context_map").get_children()
+var velocity = Vector2.ZERO
+var steering_force : Vector2 = Vector2.ZERO
+var acc = Vector2.ZERO
+var new_velocity
+var path = []
 var loot = []
 var eny = []
-var dangerEny = []
-enum {
-	KITE,
-	RETREAT,
-	COLLECT
-}
-var state = KITE
+var target
+var targetEnemy = false
+var danger_map = [0,0,0,0,0,0,0,0]
+var interest_map = []
+var context_map = [0,0,0,0,0,0,0,0]
+var vector_map = [Vector2(0,-1), Vector2(1,-1), Vector2(1,0), Vector2(1,1), Vector2(0,1), Vector2(-1,1), Vector2(-1,0), Vector2(-1,-1)]
 
 #GUI
 onready var experienceBar = get_parent().get_node("Controller/GUILayer/GUI/ExperienceBar")
@@ -84,47 +85,92 @@ func _ready():
 	
 	attack()
 
-func _physics_process(delta):
-	var rng = RandomNumberGenerator.new()
-	rng.randomize()
-	var randomnum = rng.randf()
-	
-	eny.clear()
-	eny = enemyBase.get_children()
-	if eny.size() == 0:
-		state = COLLECT
-	else:
-		if not state == RETREAT:
-			state = KITE
-	
+func _physics_process(delta):	
 	loot.clear()
 	loot = lootBase.get_children()
-	if loot.size() == 0:
-		loot.append(self)
-	
-	match state:
-		KITE:
-			move(get_circle_position(randomnum, eny[0]), delta)
-		RETREAT:
-			print("RETREAT")
-			move(dangerEny[0].global_position - self.global_position, delta)
-		COLLECT:
-			move(loot[0].global_position, delta)
-	
-func move(target, delta):
-	var direction = (target - global_position).normalized() 
-	var desired_velocity =  direction * speed
-	var steering = (desired_velocity - velocity) * delta * 2.5
-	velocity += steering
-	velocity = move_and_slide(velocity)
+	if loot.size() > 0:
+		target = loot[loot.size()-1]
+		targetEnemy = false
+	else:
+		eny.clear()
+		eny = enemyBase.get_children()
+		if eny.size() > 0:
+			target = eny[0]
+			targetEnemy = true
+		else:
+			target = self
+			targetEnemy = false
 
-func get_circle_position(random, target):
-	var kill_circle_centre = target.global_position
-	var radius = 800
-	var angle = random * PI * 2;
-	var x = kill_circle_centre.x + cos(angle) * radius;
-	var y = kill_circle_centre.y + sin(angle) * radius;
-	return Vector2(x, y)
+	for i in range(raycasts.size()):
+		raycasts[i].cast_to = vector_map[i].normalized() * 250
+
+	navigate_path()
+	convert_path_to_interest(delta)
+	convert_path_to_danger()
+	calculate_concept_map()
+	convert_context_map_to_direction()
+	steer(delta)
+	velocity = move_and_slide(velocity * speed)
+
+func steer(delta):
+	velocity += acc * delta
+
+func navigate_path():
+	path = levelNavigation.get_simple_path(global_position, target.global_position, true)
+
+func convert_path_to_interest(delta) -> void:
+	interest_map.clear()
+	if path.size() > 1:
+		var vector = to_local(path[1])
+		var player_interest_vector : Vector2 = vector.normalized()
+
+		if targetEnemy:
+			player_interest_vector = player_interest_vector.tangent() * 2 + player_interest_vector
+		for v in vector_map:
+			var val = v.normalized().dot(player_interest_vector)
+			interest_map.push_back(val)
+
+func convert_path_to_danger() -> void:
+	danger_map = [0,0,0,0,0,0,0,0]
+	for i in range(raycasts.size()):
+		var objects_collide = []
+		while raycasts[i].is_colliding():
+			var rayca : RayCast2D = raycasts[i]
+			var collider = rayca.get_collider()
+			objects_collide.append(collider)
+			raycasts[i].add_exception(collider)
+			raycasts[i].force_raycast_update()
+			if objects_collide.size() > 0:
+				danger_map[i] = 6 * objects_collide.size()
+				if i > 0:
+					danger_map[i-1] = 4 * objects_collide.size()
+				else:
+					danger_map[danger_map.size() - 1 ] = 4 * objects_collide.size()
+				if i < danger_map.size() - 1:
+					danger_map[i + 1] = 4 * objects_collide.size()
+				else:
+					danger_map[0] = 4 * objects_collide.size()
+		for x in objects_collide:
+			raycasts[i].remove_exception(x)
+		objects_collide.clear()
+
+func calculate_concept_map():
+	for i in range(interest_map.size()):
+		context_map[i] = interest_map[i] - danger_map[i]
+
+func convert_context_map_to_direction():
+	var num = -100
+	var index = 0
+	for i in range(context_map.size()):
+		if context_map[i] > num:
+			num = context_map[i]
+			index = i
+	var non_normalized_new_vel = vector_map[index]
+	new_velocity = vector_map[index].normalized()
+	velocity = velocity.normalized()
+	var non_normalized_acc = (new_velocity - velocity)
+	acc = (non_normalized_new_vel - velocity)
+	acc = acc * 5
 
 func _on_HurtBox_hurt(damage, _angle, _knockback):
 	health -= damage
@@ -169,12 +215,9 @@ func _on_EnemyDetector_body_entered(body):
 	if not enemyClose.has(body):
 		enemyClose.append(body)
 
-
 func _on_EnemyDetector_body_exited(body):
 	if enemyClose.has(body):
 		enemyClose.erase(body)
-
-
 
 func _on_GrabArea_area_entered(area):
 	if area.is_in_group("Loot"):
@@ -251,7 +294,7 @@ func upgrade_character():
 			health += 20
 			health = clamp(health, 0, maxHealth)
 		"speed":
-			speed += 10
+			speed += 20
 		"maxhp":
 			maxHealth += 5
 			health += 5
@@ -287,8 +330,13 @@ func get_random_item():
 		if not listDB.has(i):
 			listDB.append(i)
 	if listDB.size() > 0:
-		var randomItem = listDB[randi() % listDB.size()]
-		availableOptions.append(randomItem)
+		var itemGot = false
+		var randomItem
+		while not itemGot:
+			randomItem = listDB[randi() % listDB.size()]
+			if not availableOptions.has(randomItem):
+				availableOptions.append(randomItem)
+				itemGot = true
 		return randomItem
 	else:
 		return null
@@ -301,22 +349,12 @@ func death():
 	var tween = deathPanel.create_tween()
 	tween.tween_property(deathPanel, "rect_position", Vector2(412, 175), 3.0).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
 
-
 func _on_SpawnProtection_mouse_entered():
 	emit_signal("spawnProtection", true)
 
 func _on_SpawnProtection_mouse_exited():
 	emit_signal("spawnProtection", false)
 
-func _on_RetreatTimer_timeout():
-	state = KITE
 
-func _on_GrabArea_body_entered(body):
-	if body.is_in_group("Enemy"):
-		state = RETREAT
-		dangerEny.append(body)
-		retreatTimer.start()
-
-func _on_GrabArea_body_exited(body):
-	if body.is_in_group("Enemy"):
-		dangerEny.erase(body)
+func _on_DebugTimer_timeout():
+	print(danger_map)

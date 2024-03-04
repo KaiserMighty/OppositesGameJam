@@ -46,7 +46,7 @@ var tankDamageUpgrade = 0
 var tankKnockbackUpgrade = 0
 var tankSpeedUpgrade = 0
 
-var spawnPoints = 4
+var spawnPoints = 2
 
 signal upgrade_confirmed
 
@@ -164,8 +164,13 @@ func get_random_item():
 		if not listDB.has(i):
 			listDB.append(i)
 	if listDB.size() > 0:
-		var randomItem = listDB[randi() % listDB.size()]
-		availableOptions.append(randomItem)
+		var itemGot = false
+		var randomItem
+		while not itemGot:
+			randomItem = listDB[randi() % listDB.size()]
+			if not availableOptions.has(randomItem):
+				availableOptions.append(randomItem)
+				itemGot = true
 		return randomItem
 	else:
 		return null
@@ -244,7 +249,7 @@ func _on_ConfirmButton_pressed():
 		levelPanel.rect_position = Vector2(1600, 175)
 		spawnPanel.visible = true
 		get_tree().paused = false
-		spawnPoints += 4
+		spawnPoints += 2
 	else:
 		emit_signal("upgrade_confirmed")
 
