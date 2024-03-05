@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/spawn.ogg-a7b009c9b7e62ca5857bf4179e40cea4.oggstr"
+
+[deps]
+
+source_file="res://Levels/Autoshooter/sfx/spawn.ogg"
+dest_files=[ "res://.import/spawn.ogg-a7b009c9b7e62ca5857bf4179e40cea4.oggstr" ]
+
+[params]
+
+loop=false
+loop_offset=0

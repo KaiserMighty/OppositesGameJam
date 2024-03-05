@@ -59,6 +59,7 @@ onready var experienceBar = get_parent().get_node("Controller/GUILayer/GUI/Exper
 onready var healthBar = get_parent().get_node("Controller/GUILayer/GUI/HealthBar")
 onready var levelLabel = get_parent().get_node("Controller/GUILayer/GUI/ExperienceBar/Level")
 onready var levelPanel = get_parent().get_node("Controller/GUILayer/GUI/LevelUp")
+onready var lvlupsnd = get_parent().get_node("Controller/GUILayer/GUI/LevelUp/lvlupsnd")
 onready var levelUpInstructions = get_parent().get_node("Controller/GUILayer/GUI/LevelUp/UpgradeInstructions")
 onready var upgradeOptions = get_parent().get_node("Controller/GUILayer/GUI/LevelUp/UpgradeOptions")
 onready var confirmButton = get_parent().get_node("Controller/GUILayer/GUI/LevelUp/ConfirmButton")
@@ -66,6 +67,8 @@ onready var itemOptions = preload("res://Levels/Autoshooter/ItemOption.tscn")
 onready var deathPanel = get_parent().get_node("Controller/GUILayer/GUI/DeathPanel")
 onready var spawnPanel = get_parent().get_node("Controller/GUILayer/GUI/UnitSelect")
 onready var controller = get_parent().get_node("Controller")
+onready var clickSound = get_parent().get_node("Controller/click")
+onready var hoverSound = get_parent().get_node("Controller/hover")
 
 #Signal
 signal playerDeath
@@ -176,6 +179,8 @@ func _on_HurtBox_hurt(damage, _angle, _knockback):
 	health -= damage
 	healthBar.max_value = maxHealth
 	healthBar.value = health
+	if damage > 0:
+		$hurt.playing = true
 	if health <= 0:
 		death()
 
@@ -259,6 +264,7 @@ func set_experienceBar(setValue = 1, setMaxValue = 100):
 
 func levelUp():
 	levelLabel.text = str("Level ", level)
+	lvlupsnd.playing = true
 	levelUpInstructions.text = "Player will pick 1 of the 3 upgrades you give them"
 	var tween = levelPanel.create_tween()
 	tween.tween_property(levelPanel, "rect_position", Vector2(312, 175), 0.2).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_IN)
@@ -276,6 +282,7 @@ func levelUp():
 	get_tree().paused = true
 	
 func select_upgrade(upgrade, state):
+	clickSound.playing = true
 	if state == true:
 		selectedOptions.append(upgrade)
 	else:
@@ -286,6 +293,7 @@ func select_upgrade(upgrade, state):
 		confirmButton.disabled = true
 	
 func upgrade_character():
+	clickSound.playing = true
 	GlobalVars.totalUpgrades += 1
 	var upgrade = selectedOptions[randi() % selectedOptions.size()]
 	selectedOptions.clear()
@@ -354,7 +362,3 @@ func _on_SpawnProtection_mouse_entered():
 
 func _on_SpawnProtection_mouse_exited():
 	emit_signal("spawnProtection", false)
-
-
-func _on_DebugTimer_timeout():
-	print(danger_map)

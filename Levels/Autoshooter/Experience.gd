@@ -11,7 +11,7 @@ var speed = 0
 
 onready var sprite = $Sprite
 onready var collision = $CollisionShape2D
-#onready var sound = $sound
+onready var sound = $snd
 
 func _ready():
 	if experience < 2:
@@ -29,11 +29,10 @@ func _physics_process(delta):
 		speed += 2 * delta
 		
 func collect():
-	#sound.play()
+	sound.playing = true
 	collision.call_deferred("set", "disable", true)
 	sprite.visible = false
-	queue_free() #temp
 	return experience
 	
-#func _on_snd_collected_finished():
-	#queue_free()
+func _on_snd_finished():
+	queue_free()

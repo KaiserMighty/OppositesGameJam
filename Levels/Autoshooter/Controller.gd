@@ -21,6 +21,10 @@ onready var spawnPanel = get_node("GUILayer/GUI/UnitSelect")
 onready var upgradeOptions = get_node("GUILayer/GUI/LevelUp/UpgradeOptions")
 onready var confirmButton = get_node("GUILayer/GUI/LevelUp/ConfirmButton")
 onready var itemOptions = preload("res://Levels/Autoshooter/ItemOption.tscn")
+onready var spawnSound = $spawn
+onready var hoverSound = $hover
+onready var clickSound = $click
+onready var resultsSound = $results
 
 var enemyScene = preload("res://Levels/Autoshooter/Enemy.tscn")
 var strongScene = preload("res://Levels/Autoshooter/EnemyStrong.tscn")
@@ -53,6 +57,7 @@ signal upgrade_confirmed
 func _ready():
 	connect("upgrade_confirmed", player, "upgrade_character")
 	$SpawnCooldown.start()
+	spawnPanel.visible = false
 	
 func _process(delta):
 	if Input.is_key_pressed(KEY_W):
@@ -79,6 +84,7 @@ func _on_Player_playerDeath():
 	strongKillsLabel.text = "Strong Enemies - %d" % [GlobalVars.strongEnemiesKilled]
 	tankKillsLabel.text = "Tank Enemies - %d" % [GlobalVars.tankEnemiesKilled]
 	totalUpgradesLabel.text = "Total Upgrades - %d" % [GlobalVars.totalUpgrades]
+	resultsSound.playing = true
 
 func _on_SpawnCooldown_timeout():
 	spawnReady = true
@@ -100,6 +106,7 @@ func spawn(type):
 					enemy.speed += weakSpeedUpgrade
 					enemyBase.add_child(enemy)
 					spawnPoints -= 1
+					spawnSound.playing = true
 				else:
 					pass
 				
@@ -115,6 +122,7 @@ func spawn(type):
 					enemy.speed += strongSpeedUpgrade
 					enemyBase.add_child(enemy)
 					spawnPoints -= 4
+					spawnSound.playing = true
 				else:
 					pass
 			3:
@@ -129,12 +137,14 @@ func spawn(type):
 					enemy.speed += tankSpeedUpgrade
 					enemyBase.add_child(enemy)
 					spawnPoints -= 12
+					spawnSound.playing = true
 				else:
 					pass
 	else:
 		pass
 
 func monsterLevelUp():
+	clickSound.playing = true
 	levelUpInstructions.text = "Pick 2 upgrades for your spawns"
 	confirmButton.disabled = true
 	monsterUpgrade = true
@@ -149,6 +159,7 @@ func monsterLevelUp():
 	get_tree().paused = true
 	
 func selected_upgrade_monster(upgrade, state):
+	clickSound.playing = true
 	if state == true:
 		selectedOptions.append(upgrade)
 	else:
@@ -176,6 +187,7 @@ func get_random_item():
 		return null
 
 func _on_SpawnWeak_toggled(button_pressed):
+	clickSound.playing = true
 	if button_pressed:
 		strongButton.pressed = false
 		tankButton.pressed = false
@@ -184,6 +196,7 @@ func _on_SpawnWeak_toggled(button_pressed):
 		selectedEnemy = 0
 
 func _on_SpawnStrong_toggled(button_pressed):
+	clickSound.playing = true
 	if button_pressed:
 		weakButton.pressed = false
 		tankButton.pressed = false
@@ -192,6 +205,7 @@ func _on_SpawnStrong_toggled(button_pressed):
 		selectedEnemy = 0
 
 func _on_SpawnTank_toggled(button_pressed):
+	clickSound.playing = true
 	if button_pressed:
 		strongButton.pressed = false
 		weakButton.pressed = false
@@ -209,6 +223,7 @@ func _on_UnitSelect_mouse_exited():
 	ignoreMouse = false
 
 func _on_ConfirmButton_pressed():
+	clickSound.playing = true
 	if monsterUpgrade == true:
 		confirmButton.disabled = true
 		monsterUpgrade = false
@@ -255,3 +270,26 @@ func _on_ConfirmButton_pressed():
 
 func _on_Button_pressed():
 	get_node("GUILayer/GUI/Tutorial").visible = false
+	clickSound.playing = true
+	spawnPanel.visible = true
+
+func _on_SpawnWeak_mouse_entered():
+	hoverSound.playing = true
+
+func _on_SpawnStrong_mouse_entered():
+	hoverSound.playing = true
+
+func _on_SpawnTank_mouse_entered():
+	hoverSound.playing = true
+
+func _on_ConfirmButton_mouse_entered():
+	if confirmButton.disabled:
+		pass
+	else:
+		hoverSound.playing = true
+
+func _on_Button_mouse_entered():
+	hoverSound.playing = true
+
+func _on_MainMenu_mouse_entered():
+	hoverSound.playing = true

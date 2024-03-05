@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/death.ogg-de412240a6e43feabf4d73d881ebac2d.oggstr"
+
+[deps]
+
+source_file="res://Levels/Autoshooter/sfx/death.ogg"
+dest_files=[ "res://.import/death.ogg-de412240a6e43feabf4d73d881ebac2d.oggstr" ]
+
+[params]
+
+loop=false
+loop_offset=0

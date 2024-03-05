@@ -1,7 +1,9 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Levels/Autoshooter/Player.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Levels/Autoshooter/music.gd" type="Script" id=2]
 [ext_resource path="res://Levels/Autoshooter/Controller.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Levels/Autoshooter/sfx/battle.ogg" type="AudioStream" id=4]
 
 [sub_resource type="NavigationPolygon" id=1]
 vertices = PoolVector2Array( 46373, -25898, 50469, 31958, -44763, 36694, -32859, -18090 )
@@ -25,5 +27,14 @@ outlines = [ PoolVector2Array( -32859, -18090, -44763, 36694, 50469, 31958, 4637
 [node name="NavigationPolygonInstance" type="NavigationPolygonInstance" parent="Navigation2D"]
 navpoly = SubResource( 1 )
 
+[node name="music" type="AudioStreamPlayer" parent="."]
+pause_mode = 2
+stream = ExtResource( 4 )
+volume_db = -12.0
+autoplay = true
+bus = "Music"
+script = ExtResource( 2 )
+
 [connection signal="playerDeath" from="Player" to="Controller" method="_on_Player_playerDeath"]
+[connection signal="playerDeath" from="Player" to="music" method="_on_Player_playerDeath"]
 [connection signal="spawnProtection" from="Player" to="Controller" method="_on_Player_spawnProtection"]

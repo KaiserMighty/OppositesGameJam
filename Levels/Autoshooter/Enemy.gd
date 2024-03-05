@@ -12,10 +12,12 @@ var move = Vector2()
 var playerPos
 var targetPos
 var experience = preload("res://Levels/Autoshooter/Experience.tscn")
+var deathAnim = preload("res://Levels/Autoshooter/Death.tscn")
 
 onready var player = get_parent().get_parent().get_node("Player")
 onready var lootBase = get_parent().get_parent().get_node("Loot")
 onready var controller = get_parent().get_parent().get_node("Controller")
+onready var sprite = $Sprite
 onready var hitBox = $HitBox
 
 signal removeFromArray(object)
@@ -40,6 +42,10 @@ func death():
 	newExp.experience = experienceDrop
 	lootBase.call_deferred("add_child", newExp)
 	controller.spawnPoints += spawnCost
+	var enemyDeath = deathAnim.instance()
+	enemyDeath.scale = sprite.scale
+	enemyDeath.global_position = global_position
+	get_parent().call_deferred("add_child", enemyDeath)
 	queue_free()
 
 func _on_HurtBox_hurt(damage, angle, knockbackAmnt):

@@ -1,9 +1,14 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Levels/Autoshooter/Camera.gd" type="Script" id=1]
 [ext_resource path="res://Levels/Autoshooter/TimerLabel.gd" type="Script" id=2]
 [ext_resource path="res://Levels/Autoshooter/MainMenuButton.gd" type="Script" id=3]
 [ext_resource path="res://Levels/Autoshooter/Controller.gd" type="Script" id=4]
+[ext_resource path="res://Levels/Autoshooter/sfx/spawn.ogg" type="AudioStream" id=5]
+[ext_resource path="res://Levels/Autoshooter/sfx/lvlup.ogg" type="AudioStream" id=6]
+[ext_resource path="res://Levels/Autoshooter/sfx/click.ogg" type="AudioStream" id=7]
+[ext_resource path="res://Levels/Autoshooter/sfx/hover.ogg" type="AudioStream" id=8]
+[ext_resource path="res://Levels/Autoshooter/sfx/results.ogg" type="AudioStream" id=9]
 
 [sub_resource type="RectangleShape2D" id=2]
 extents = Vector2( 450, 40 )
@@ -105,6 +110,10 @@ text = "Player will pick 1 of the 3 choice you give them"
 align = 1
 valign = 1
 
+[node name="lvlupsnd" type="AudioStreamPlayer" parent="GUILayer/GUI/LevelUp"]
+stream = ExtResource( 6 )
+volume_db = -8.0
+
 [node name="DeathPanel" type="Panel" parent="GUILayer/GUI"]
 pause_mode = 2
 unique_name_in_owner = true
@@ -168,6 +177,11 @@ margin_right = 150.0
 margin_bottom = 225.0
 text = "Main Menu"
 script = ExtResource( 3 )
+
+[node name="click2" type="AudioStreamPlayer" parent="GUILayer/GUI/DeathPanel/MainMenu"]
+pause_mode = 2
+stream = ExtResource( 7 )
+volume_db = -6.0
 
 [node name="TimerLabel" type="Label" parent="GUILayer/GUI"]
 margin_left = 462.0
@@ -341,14 +355,40 @@ text = "Defeat the Player"
 [node name="SpawnCooldown" type="Timer" parent="."]
 one_shot = true
 
+[node name="spawn" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 5 )
+volume_db = -16.0
+pitch_scale = 2.0
+
+[node name="hover" type="AudioStreamPlayer" parent="."]
+pause_mode = 2
+stream = ExtResource( 8 )
+volume_db = -6.0
+
+[node name="click" type="AudioStreamPlayer" parent="."]
+pause_mode = 2
+stream = ExtResource( 7 )
+volume_db = -6.0
+
+[node name="results" type="AudioStreamPlayer" parent="."]
+pause_mode = 2
+stream = ExtResource( 9 )
+volume_db = -8.0
+
+[connection signal="mouse_entered" from="GUILayer/GUI/LevelUp/ConfirmButton" to="." method="_on_ConfirmButton_mouse_entered"]
 [connection signal="pressed" from="GUILayer/GUI/LevelUp/ConfirmButton" to="." method="_on_ConfirmButton_pressed"]
+[connection signal="mouse_entered" from="GUILayer/GUI/DeathPanel/MainMenu" to="." method="_on_MainMenu_mouse_entered"]
 [connection signal="pressed" from="GUILayer/GUI/DeathPanel/MainMenu" to="GUILayer/GUI/DeathPanel/MainMenu" method="_on_MainMenu_pressed"]
 [connection signal="mouse_entered" from="GUILayer/GUI/UnitSelect" to="." method="_on_UnitSelect_mouse_entered"]
 [connection signal="mouse_exited" from="GUILayer/GUI/UnitSelect" to="." method="_on_UnitSelect_mouse_exited"]
 [connection signal="area_entered" from="GUILayer/GUI/UnitSelect/SpawnPanel" to="." method="_on_SpawnPanel_area_entered"]
 [connection signal="area_exited" from="GUILayer/GUI/UnitSelect/SpawnPanel" to="." method="_on_SpawnPanel_area_exited"]
+[connection signal="mouse_entered" from="GUILayer/GUI/UnitSelect/HBoxContainer/SpawnWeak" to="." method="_on_SpawnWeak_mouse_entered"]
 [connection signal="toggled" from="GUILayer/GUI/UnitSelect/HBoxContainer/SpawnWeak" to="." method="_on_SpawnWeak_toggled"]
+[connection signal="mouse_entered" from="GUILayer/GUI/UnitSelect/HBoxContainer/SpawnStrong" to="." method="_on_SpawnStrong_mouse_entered"]
 [connection signal="toggled" from="GUILayer/GUI/UnitSelect/HBoxContainer/SpawnStrong" to="." method="_on_SpawnStrong_toggled"]
+[connection signal="mouse_entered" from="GUILayer/GUI/UnitSelect/HBoxContainer/SpawnTank" to="." method="_on_SpawnTank_mouse_entered"]
 [connection signal="toggled" from="GUILayer/GUI/UnitSelect/HBoxContainer/SpawnTank" to="." method="_on_SpawnTank_toggled"]
+[connection signal="mouse_entered" from="GUILayer/GUI/Tutorial/Button" to="." method="_on_Button_mouse_entered"]
 [connection signal="pressed" from="GUILayer/GUI/Tutorial/Button" to="." method="_on_Button_pressed"]
 [connection signal="timeout" from="SpawnCooldown" to="." method="_on_SpawnCooldown_timeout"]
