@@ -69,6 +69,21 @@ func _process(delta):
 	if Input.is_key_pressed(KEY_D):
 		position.x += 4
 	
+	if spawnPoints < 1:
+		weakButton.pressed = false
+		weakButton.disabled = true
+	else:
+		weakButton.disabled = false
+	if spawnPoints < 4:
+		strongButton.pressed = false
+		strongButton.disabled = true
+	else:
+		strongButton.disabled = false
+	if spawnPoints < 12:
+		tankButton.pressed = false
+		tankButton.disabled = true
+	else:
+		tankButton.disabled = false
 	spawnCooldownPB.value = 1 - $SpawnCooldown.time_left
 	clamp(spawnPoints, 0, 99)
 	var spawnPointsUpdate = "%02d" % [spawnPoints]
@@ -274,13 +289,16 @@ func _on_Button_pressed():
 	spawnPanel.visible = true
 
 func _on_SpawnWeak_mouse_entered():
-	hoverSound.playing = true
+	if weakButton.disabled == false:
+		hoverSound.playing = true
 
 func _on_SpawnStrong_mouse_entered():
-	hoverSound.playing = true
+	if strongButton.disabled == false:
+		hoverSound.playing = true
 
 func _on_SpawnTank_mouse_entered():
-	hoverSound.playing = true
+	if tankButton.disabled == false:
+		hoverSound.playing = true
 
 func _on_ConfirmButton_mouse_entered():
 	if confirmButton.disabled:

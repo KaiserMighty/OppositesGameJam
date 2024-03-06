@@ -298,19 +298,18 @@ valign = 1
 
 [node name="Tutorial" type="Panel" parent="GUILayer/GUI"]
 margin_left = 412.0
-margin_top = 200.0
+margin_top = 175.0
 margin_right = 612.0
-margin_bottom = 400.0
+margin_bottom = 425.0
 rect_min_size = Vector2( 200, 200 )
 mouse_filter = 2
 
 [node name="Zoom" type="Label" parent="GUILayer/GUI/Tutorial"]
-margin_left = 40.0
-margin_top = 20.0
-margin_right = 190.0
-margin_bottom = 51.0
+margin_left = 22.0
+margin_top = 15.0
+margin_right = 182.0
+margin_bottom = 63.0
 grow_horizontal = 2
-rect_scale = Vector2( 0.8, 0.8 )
 text = "Zoom in and out
 with the scroll wheel
 Move camera with WASD"
@@ -318,12 +317,11 @@ align = 1
 valign = 1
 
 [node name="Spawn" type="Label" parent="GUILayer/GUI/Tutorial"]
-margin_left = 40.0
-margin_top = 67.0
-margin_right = 190.0
-margin_bottom = 115.0
+margin_left = 22.0
+margin_top = 75.0
+margin_right = 179.0
+margin_bottom = 123.0
 grow_horizontal = 2
-rect_scale = Vector2( 0.8, 0.8 )
 text = "Green is the player's
 monitor dimensions
 Spawn units outside of it"
@@ -331,12 +329,11 @@ align = 1
 valign = 1
 
 [node name="Kill" type="Label" parent="GUILayer/GUI/Tutorial"]
-margin_left = 40.0
-margin_top = 114.0
-margin_right = 190.0
-margin_bottom = 162.0
+margin_left = 22.0
+margin_top = 135.0
+margin_right = 180.0
+margin_bottom = 183.0
 grow_horizontal = 2
-rect_scale = Vector2( 0.8, 0.8 )
 text = "Select unit below and
 click within the play area
 to spawn your units"
@@ -344,10 +341,10 @@ align = 1
 valign = 1
 
 [node name="Button" type="Button" parent="GUILayer/GUI/Tutorial"]
-margin_left = 50.0
-margin_top = 160.0
-margin_right = 150.0
-margin_bottom = 185.0
+margin_left = 39.0
+margin_top = 200.0
+margin_right = 161.0
+margin_bottom = 225.0
 grow_horizontal = 2
 rect_min_size = Vector2( 100, 25 )
 text = "Defeat the Player"

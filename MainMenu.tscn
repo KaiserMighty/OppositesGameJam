@@ -77,6 +77,15 @@ rect_min_size = Vector2( 256, 16 )
 text = "Master Volume"
 align = 1
 
+[node name="Label" type="Label" parent="."]
+margin_left = 412.0
+margin_top = 40.0
+margin_right = 612.0
+margin_bottom = 60.0
+text = " Placeholder Art"
+align = 1
+valign = 1
+
 [connection signal="mouse_entered" from="Play" to="." method="_on_Play_mouse_entered"]
 [connection signal="pressed" from="Play" to="." method="_on_Play_pressed"]
 [connection signal="value_changed" from="Music" to="." method="_on_Music_value_changed"]
